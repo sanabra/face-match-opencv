@@ -1,0 +1,8 @@
+cmake
+numpy
+opencv-python
+dlib
+face-recognition
+docopt
+# sklearn
+argparse
