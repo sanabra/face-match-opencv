@@ -2,6 +2,7 @@ import face_recognition
 import cv2
 import numpy as np
 from enum import Enum
+from load_face import load_face_file
 
 
 class DetectType(Enum):
@@ -29,7 +30,7 @@ def show(title_window, image, face_locations, face_names):
         cv2.imshow(title_window, image)
 
 
-def detect_picture(image, faces_encodings, faces_names):
+def detect_image(image, faces_encodings, faces_names):
     face_names = []
     face_locations = face_recognition.face_locations(image)
     if len(face_locations) >= 1:
@@ -46,6 +47,14 @@ def detect_picture(image, faces_encodings, faces_names):
     return face_locations, face_names
 
 
+def detect_picture_file(picture_file, faces_encodings, faces_names):
+    img = load_face_file(picture_file)
+    face_locations, face_names = detect_image(img, faces_encodings, faces_names)
+    show('Picture', img, face_locations, face_names)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
 def detect_webcam(faces_encodings, faces_names):
     video_capture = cv2.VideoCapture(0)
 
@@ -53,12 +62,11 @@ def detect_webcam(faces_encodings, faces_names):
         ret, frame = video_capture.read()
         small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
         frame_image = small_frame[:, :, ::-1]
-        face_locations, face_names = detect_picture(frame_image, faces_encodings, faces_names)
+        face_locations, face_names = detect_image(frame_image, faces_encodings, faces_names)
         show('Video', frame, face_locations, face_names)
 
         # Hit 'q' on the keyboard to quit!
         if cv2.waitKey(20) & 0xFF == ord('q'):
             break
 
-    cv2.waitKey(0)
     cv2.destroyAllWindows()

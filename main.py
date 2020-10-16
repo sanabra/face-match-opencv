@@ -1,10 +1,9 @@
 import argparse
 import sys
-from load_face import load_face_file, TRAINED_OUTPUT_FILE
+from load_face import TRAINED_OUTPUT_FILE
 from load_face import load_faces
-from detect import DetectType
+from detect import DetectType, detect_picture_file
 from detect import detect_webcam
-from detect import detect_picture
 
 
 if __name__ == '__main__':
@@ -47,4 +46,4 @@ if __name__ == '__main__':
         if args.file is None:
             sys.exit('You must inform the name of the file containing the image to be analyzed')
         else:
-            detect_picture(load_face_file(args.file), faces_encodings, faces_names)
+            detect_picture_file(args.file, faces_encodings, faces_names)
