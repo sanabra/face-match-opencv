@@ -4,5 +4,5 @@ opencv-python
 dlib
 face-recognition
 docopt
-# sklearn
+sklearn
 argparse
