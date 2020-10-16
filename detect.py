@@ -2,7 +2,7 @@ import face_recognition
 import cv2
 import numpy as np
 from enum import Enum
-from load_face import load_face_file
+from load_face import load_file
 
 
 class DetectType(Enum):
@@ -48,7 +48,7 @@ def detect_image(image, faces_encodings, faces_names):
 
 
 def detect_picture_file(picture_file, faces_encodings, faces_names):
-    img = load_face_file(picture_file)
+    img = load_file(picture_file)
     face_locations, face_names = detect_image(img, faces_encodings, faces_names)
     show('Picture', img, face_locations, face_names)
     cv2.waitKey(0)

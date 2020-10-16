@@ -1,7 +1,7 @@
 import argparse
 import sys
 from load_face import TRAINED_OUTPUT_FILE
-from load_face import load_faces
+from load_face import load_faces_data
 from detect import DetectType, detect_picture_file
 from detect import detect_webcam
 
@@ -36,9 +36,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    faces_encodings, faces_names = load_faces(files_dir=args.train_dir,
-                                              output_file=args.train_output_file,
-                                              input_file=args.trained_input_file)
+    faces_encodings, faces_names = load_faces_data(files_dir=args.train_dir,
+                                                   output_file=args.train_output_file,
+                                                   input_file=args.trained_input_file)
 
     if args.detect_type == DetectType.WEBCAM:
         detect_webcam(faces_encodings, faces_names)
