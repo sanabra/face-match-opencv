@@ -4,14 +4,9 @@ import os
 
 # ARTICLE https://towardsdatascience.com/building-a-face-recognizer-in-python-7fd6630c6340
 def load_faces_directory(files_dir):
-    # Training the SVC classifier
-    # The training data would be all the
-    # face encodings from all the known
-    # images and the labels are their names
     encodings = []
     names = []
 
-    # Training directory
     if files_dir[-1] != '/':
         files_dir += '/'
     train_dir = os.listdir(files_dir)
@@ -26,8 +21,7 @@ def load_faces_directory(files_dir):
             # Loop through each training image for the current person
             for person_img in pix:
                 # Get the face encodings for the face in each image file
-                face = face_recognition.load_image_file(
-                    files_dir + person + "/" + person_img)
+                face = face_recognition.load_image_file(files_dir + person + "/" + person_img)
                 face_bounding_boxes = face_recognition.face_locations(face)
 
                 # If training image contains exactly one face
