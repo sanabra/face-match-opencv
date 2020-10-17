@@ -5,6 +5,7 @@ import os
 import pickle
 import sys
 
+
 TRAINED_OUTPUT_FILE = 'data.dat'
 
 
@@ -25,7 +26,7 @@ def load_file(face_file):
         sys.exit('Could not load image. File {} not found.'.format(face_file))
 
 
-def load_person_face(person_img, files_dir, person, encodings, names):
+def load_person_face(person_img, files_dir, person):
 
     # Get the face encodings for the face in each image file
     face = load_file(files_dir + person + "/" + person_img)
@@ -33,18 +34,30 @@ def load_person_face(person_img, files_dir, person, encodings, names):
 
     # If training image contains exactly one face
     if len(face_bounding_boxes) == 1:
-        face_enc = face_recognition.face_encodings(face)[0]
-        # Add face encoding for current image
-        # with corresponding label (name) to the training data
-        encodings.append(face_enc)
-        names.append(person)
+        return face_recognition.face_encodings(face)[0]
     else:
         print(person + "/" + person_img + " can't be used for training")
         os.remove(files_dir + person + "/" + person_img)
+        return
+
+
+def load_person_directory(person, files_dir, encodings, names):
+    print('Loading {} faces'.format(person))
+    pix = os.listdir(files_dir + person)
+
+    if len(pix) == 0:
+        print("rm -R " + files_dir + person)
+    else:
+        for person_img in pix:
+            encoding = load_person_face(person_img, files_dir, person)
+            if encoding is not None:
+                encodings.append(encoding)
+                names.append(person)
+
     return encodings, names
 
 
-def load_person_directory(person, files_dir):
+def load_person_directory_paralel(person, files_dir):
     print('Loading {} faces'.format(person))
     pix = os.listdir(files_dir + person)
 
@@ -55,7 +68,10 @@ def load_person_directory(person, files_dir):
         encodings = []
         names = []
         for person_img in pix:
-            load_person_face(person_img, files_dir, person, encodings, names)
+            encoding = load_person_face(person_img, files_dir, person)
+            if encoding is not None:
+                encodings.append(encoding)
+                names.append(person)
 
         return encodings, names
 
@@ -67,8 +83,11 @@ def load_faces_directory(files_dir):
     train_dir = os.listdir(files_dir)
 
     pool = multiprocessing.Pool(20)
-    _load_person_directory = partial(load_person_directory, files_dir=files_dir)
+    _load_person_directory = partial(load_person_directory_paralel, files_dir=files_dir)
     encodings, names = zip(*pool.map(_load_person_directory, train_dir))
+
+    encodings = [item for sublist in encodings for item in sublist]
+    names = [item for sublist in names for item in sublist]
 
     return {'encodings': encodings, 'names': names}
 
@@ -83,6 +102,6 @@ def load_faces_data(files_dir=None, output_file=TRAINED_OUTPUT_FILE, input_file=
             result = load_trained_file(input_file)
         else:
             sys.exit('File containing the learned content not exists. File {} not found.'.format(input_file))
-    print('Total people = {}'.format(len(result['names'])))
+    print('Total people = {}'.format(len(set(result['names']))))
     print('Total faces = {}'.format(len(result['encodings'])))
     return result['encodings'], result['names']

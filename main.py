@@ -5,9 +5,7 @@ from load_face import load_faces_data
 from detect import DetectType, detect_picture_file
 from detect import detect_webcam
 
-
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser(description='Face Classification in Python')
 
     training_facial_arguments = parser.add_argument_group('Training facial arguments')
