@@ -7,6 +7,7 @@ import sys
 
 
 TRAINED_OUTPUT_FILE = 'data.dat'
+MULTIPROCESSING_POOL = 20
 
 
 def save_trained_file(result, output_file):
@@ -76,13 +77,13 @@ def load_person_directory_paralel(person, files_dir):
         return encodings, names
 
 
-def load_faces_directory(files_dir):
+def load_faces_directory(files_dir, pool):
 
     if files_dir[-1] != '/':
         files_dir += '/'
     train_dir = os.listdir(files_dir)
 
-    pool = multiprocessing.Pool(20)
+    pool = multiprocessing.Pool(pool)
     _load_person_directory = partial(load_person_directory_paralel, files_dir=files_dir)
     encodings, names = zip(*pool.map(_load_person_directory, train_dir))
 
@@ -92,9 +93,10 @@ def load_faces_directory(files_dir):
     return {'encodings': encodings, 'names': names}
 
 
-def load_faces_data(files_dir=None, output_file=TRAINED_OUTPUT_FILE, input_file=TRAINED_OUTPUT_FILE):
+def load_faces_data(files_dir=None, output_file=TRAINED_OUTPUT_FILE, input_file=TRAINED_OUTPUT_FILE,
+                    pool=MULTIPROCESSING_POOL):
     if files_dir is not None:
-        result = load_faces_directory(files_dir)
+        result = load_faces_directory(files_dir, pool)
         if output_file is not None:
             save_trained_file(result, output_file)
     else:
@@ -102,6 +104,8 @@ def load_faces_data(files_dir=None, output_file=TRAINED_OUTPUT_FILE, input_file=
             result = load_trained_file(input_file)
         else:
             sys.exit('File containing the learned content not exists. File {} not found.'.format(input_file))
-    print('Total people = {}'.format(len(set(result['names']))))
-    print('Total faces = {}'.format(len(result['encodings'])))
+    print('People = {}'.format(len(set(result['names']))))
+    print('Faces = {}'.format(len(result['encodings'])))
+    print('Features = {}'.format(result['encodings'][0].shape[0]))
+
     return result['encodings'], result['names']

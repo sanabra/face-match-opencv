@@ -6,3 +6,5 @@ face-recognition
 docopt
 sklearn
 argparse
+matplotlib
+pandas

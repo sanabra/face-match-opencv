@@ -1,6 +1,6 @@
 import argparse
 import sys
-from load_face import TRAINED_OUTPUT_FILE
+from load_face import TRAINED_OUTPUT_FILE, MULTIPROCESSING_POOL
 from load_face import load_faces_data
 from detect import DetectType, detect_picture_file
 from detect import detect_webcam
@@ -16,6 +16,10 @@ if __name__ == '__main__':
                                            type=str, default=TRAINED_OUTPUT_FILE,
                                            help='Output file name with learned data. (default value = {})'
                                            .format(TRAINED_OUTPUT_FILE))
+    training_facial_arguments.add_argument('-p', '--pool', nargs='?',
+                                           type=int, default=MULTIPROCESSING_POOL,
+                                           help='Multiprocessing pool (default value = {})'
+                                           .format(MULTIPROCESSING_POOL))
 
     facial_match_arguments = parser.add_argument_group('Facial match arguments')
     facial_match_arguments.add_argument('-i', '--trained_input_file', nargs='?',
@@ -27,7 +31,6 @@ if __name__ == '__main__':
                                         type=DetectType, choices=list(DetectType), required=True,
                                         help='If you want to test with face recognition, '
                                              'you can use it from an image in the file or via the webcam')
-
     facial_match_arguments.add_argument('-f', '--file', nargs='?',
                                         type=str,
                                         help='Detect using file')
@@ -36,7 +39,8 @@ if __name__ == '__main__':
 
     faces_encodings, faces_names = load_faces_data(files_dir=args.train_dir,
                                                    output_file=args.train_output_file,
-                                                   input_file=args.trained_input_file)
+                                                   input_file=args.trained_input_file,
+                                                   pool=args.pool)
 
     if args.detect_type == DetectType.WEBCAM:
         detect_webcam(faces_encodings, faces_names)
